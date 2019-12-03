@@ -1,3 +1,6 @@
+/*
+    Lower level utility methods to fetch data from github and preprocess that data
+*/
 const octokit = require("@octokit/rest");
 const githubApi = new octokit();
 const async = require('async');
@@ -30,6 +33,7 @@ function getContributorsByRepo(org, repositoryName) {
                 "User-Agent": settings.organisation
             }
         });
+    // collect all contributors for a repo, map them to Profile class
         githubApi.paginate(options)
             .then(data => {
                 data = data
@@ -54,6 +58,7 @@ function getReposByOrg(organisation) {
                 "User-Agent": settings.organisation
             }
         });
+    // collect all repos for an organisation, map the data to Repositor class and return
         githubApi.paginate(options)
             .then(data => {
                 data = data
@@ -66,6 +71,7 @@ function getReposByOrg(organisation) {
             });
     });
 }
+// Flatten 2D array consisting of unique users
 function preProcess(data) {
     return new Promise(async (resolve, reject) => {
         data = Array.prototype.concat.apply([], data);

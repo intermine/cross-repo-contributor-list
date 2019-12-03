@@ -7,12 +7,13 @@ class Cache {
             checkperiod: ttlSeconds * 0.2,
         });
     }
+    // get contributors from cache 
     get(key, gitHubApi) {
         const value = this.cache.get(key);
         if (value) {
             return Promise.resolve(value);
         }
-
+    // or get it from github
         return gitHubApi.then((result) => {
             this.cache.set(key, result);
             return result;
