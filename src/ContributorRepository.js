@@ -1,3 +1,6 @@
+/*
+    Lower level utility methods to fetch data from github and preprocess that data
+*/
 const octokit = require("@octokit/rest");
 const githubApi = new octokit();
 const async = require('async');
@@ -5,10 +8,10 @@ const Repository = require('./Repository.js');
 const Profile = require('./Profile.js');
 const settings = require('./settings.js');
 
-function getContributorsByOrg(organisation) {
-    return getReposByOrg(organisation).then((data) => {
+function getContributorsByOrg(organization) {
+    return getReposByOrg(organization).then((data) => {
         return async.mapLimit(data, 10, async function (repository) {
-            const contributorPromise = await getContributorsByRepo(organisation, repository["name"]);
+            const contributorPromise = await getContributorsByRepo(organization, repository["name"]);
             return contributorPromise;
         });
     }).then(async (result) => {
@@ -27,9 +30,10 @@ function getContributorsByRepo(org, repositoryName) {
             headers: {
                 Accept: "application/vnd.github.v3+json",
                 Authorization: settings.access_token,
-                "User-Agent": settings.organisation
+                "User-Agent": settings.organization
             }
         });
+    // collect all contributors for a repo, map them to Profile class
         githubApi.paginate(options)
             .then(data => {
                 data = data
@@ -43,17 +47,18 @@ function getContributorsByRepo(org, repositoryName) {
     });
 }
 
-function getReposByOrg(organisation) {
+function getReposByOrg(organization) {
     return new Promise((resolve, reject) => {
         var options = githubApi.repos.listForOrg.endpoint.merge({
-            org: organisation,
+            org: organization,
             type: "all",
             headers: {
                 Accept: "application/vnd.github.v3+json",
                 Authorization: settings.access_token,
-                "User-Agent": settings.organisation
+                "User-Agent": settings.organization
             }
         });
+    // collect all repos for an organization, map the data to Repositor class and return
         githubApi.paginate(options)
             .then(data => {
                 data = data
@@ -66,6 +71,7 @@ function getReposByOrg(organisation) {
             });
     });
 }
+// Flatten 2D array consisting of unique users
 function preProcess(data) {
     return new Promise(async (resolve, reject) => {
         data = Array.prototype.concat.apply([], data);
