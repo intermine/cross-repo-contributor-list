@@ -8,7 +8,7 @@ const cors = require('cors');
 const appRouter = function(app){
 
     app.get('/contributors',cors(),async (req,res)=>{
-        res.status(200).send(await ContributorService.getContributorByOrganisation(settings.organisation));
+        res.status(200).send(await ContributorService.getContributorByOrganisation(settings.organization));
     });
     
     app.delete('/flushAll',cors(),(req,res)=>{
